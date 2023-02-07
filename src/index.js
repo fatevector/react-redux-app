@@ -7,7 +7,8 @@ const App = params => {
   const double = num => num * 2
   const square = num => num*num
   const half = num => num / 2
-  const mathCalculate=pipe(double, square, half)
+  const divide = num2 => num1 => num1 / num2
+  const mathCalculate=pipe(double, square, half, divide(3))
   return <h1>{mathCalculate(x)}</h1>
 }
 
