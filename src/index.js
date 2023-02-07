@@ -2,7 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 const App = params => {
-  return <h1>App</h1>
+  const someFn = () => () => 'app'
+  const fn = someFn()
+  return <h1>{fn()}</h1>
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
