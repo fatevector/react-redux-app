@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 
 const taskReducer = (state, action) => {
@@ -17,11 +17,16 @@ const taskReducer = (state, action) => {
 
 const createStore = (reducer, initialState) => {
     let state = initialState;
-    const getState = () => state;
+    const listeners = [];
+    const getState = () => [...state];
     const dispatch = action => {
         state = reducer(state, action);
+        listeners.forEach(listener => listener());
     };
-    return { getState, dispatch };
+    const subscribe = listener => {
+        listeners.push(listener);
+    };
+    return { getState, dispatch, subscribe };
 };
 const store = createStore(taskReducer, [
     { id: 1, description: "Task 1", completed: false },
@@ -29,11 +34,16 @@ const store = createStore(taskReducer, [
 ]);
 
 const App = params => {
-    const state = store.getState();
+    const [state, setState] = useState(store.getState());
+
+    useEffect(() => {
+        store.subscribe(() => {
+            setState(store.getState());
+        });
+    }, []);
 
     const completeTask = id => {
         store.dispatch({ type: "task/completed", payload: { id } });
-        console.log(store.getState());
     };
 
     return (
