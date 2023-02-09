@@ -4,6 +4,7 @@ import {
     titleChanged,
     taskDeleted,
     completeTask,
+    createTask,
     loadTasks,
     getTasks,
     getTasksLoadingStatus
@@ -56,6 +57,9 @@ const App = params => {
                     </li>
                 ))}
             </ul>
+            <button onClick={() => dispatch(createTask("New task"))}>
+                Add new task
+            </button>
         </>
     );
 };
