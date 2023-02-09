@@ -13,8 +13,8 @@ const taskSlice = createSlice({
             state.isLoading = false;
         },
         update(state, action) {
-            const elementIndex = state.findIndex(
-                el => el.id === action.entities.payload.id
+            const elementIndex = state.entities.findIndex(
+                el => el.id === action.payload.id
             );
             state.entities[elementIndex] = {
                 ...state.entities[elementIndex],
@@ -38,7 +38,7 @@ const taskSlice = createSlice({
 const { actions, reducer: taskReducer } = taskSlice;
 const { received, update, remove, taskRequested, taskRequestFailed } = actions;
 
-export const getTasks = () => async dispatch => {
+export const loadTasks = () => async dispatch => {
     dispatch(taskRequested());
     try {
         const data = await todosService.fetch();
@@ -54,7 +54,9 @@ export const completeTask = id => dispatch => {
 };
 
 export const titleChanged = id => update({ id, title: `New title for ${id}` });
-
 export const taskDeleted = id => remove({ id });
+
+export const getTasks = () => state => state.tasks.entities;
+export const getTasksLoadingStatus = () => state => state.tasks.isLoading;
 
 export default taskReducer;
