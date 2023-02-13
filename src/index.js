@@ -1,30 +1,40 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import * as actions from "./store/actions";
-import { initiateStore } from "./store/store";
+import {
+    titleChanged,
+    taskDeleted,
+    completeTask,
+    createTask,
+    loadTasks,
+    getTasks,
+    getTasksLoadingStatus
+} from "./store/task";
+import createStore from "./store/store";
+import { Provider, useSelector, useDispatch } from "react-redux";
+import { getErrors } from "./store/errors";
 
-const store = initiateStore();
+const store = createStore();
 
 const App = params => {
-    const [state, setState] = useState(store.getState());
+    const state = useSelector(getTasks());
+    const isLoading = useSelector(getTasksLoadingStatus());
+    const error = useSelector(getErrors());
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        store.subscribe(() => {
-            setState(store.getState());
-        });
+        dispatch(loadTasks());
     }, []);
 
-    const completeTask = taskId => {
-        store.dispatch(actions.taskCompleted(taskId));
-    };
-
     const changeTitle = taskId => {
-        store.dispatch(actions.titleChanged(taskId));
+        dispatch(titleChanged(taskId));
     };
 
     const deleteTask = taskId => {
-        store.dispatch(actions.taskDeleted(taskId));
+        dispatch(taskDeleted(taskId));
     };
+
+    if (isLoading) return <h1>Loading</h1>;
+    if (error) return <p>{error}</p>;
 
     return (
         <>
@@ -34,7 +44,7 @@ const App = params => {
                     <li key={el.id}>
                         <p>{el.title}</p>
                         <p>{`Completed: ${el.completed}`}</p>
-                        <button onClick={() => completeTask(el.id)}>
+                        <button onClick={() => dispatch(completeTask(el.id))}>
                             Complete
                         </button>
                         <button onClick={() => changeTitle(el.id)}>
@@ -47,6 +57,9 @@ const App = params => {
                     </li>
                 ))}
             </ul>
+            <button onClick={() => dispatch(createTask("New task"))}>
+                Add new task
+            </button>
         </>
     );
 };
@@ -54,6 +67,8 @@ const App = params => {
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
     <React.StrictMode>
-        <App />
+        <Provider store={store}>
+            <App />
+        </Provider>
     </React.StrictMode>
 );
